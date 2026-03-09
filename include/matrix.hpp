@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstring>
 #include <vector>
+#include <cmath>
 
 namespace Matrix {
 template <typename T> class MatrixData {
