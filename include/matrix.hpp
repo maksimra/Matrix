@@ -25,8 +25,14 @@ public:
   MatrixData(int cols, int rows, T val = T{})
       : x_(cols), y_(rows), data_(new T[x_ * y_]) {
     size_t numElems = x_ * y_;
-    for (int i = 0; i < numElems; ++i) {
-      data_[i] = val;
+    try {
+      for (int i = 0; i < numElems; ++i) {
+        data_[i] = val;
+      }
+    }
+    catch (...) {
+      delete [] data_;
+      throw;  
     }
   }
 
@@ -35,13 +41,20 @@ public:
       : x_(cols), y_(rows), data_(new T[x_ * y_]) {
     assert(std::distance(start, fin) == x_ * y_);
 
-    It elem = start;
-    for (int y = 0; y < rows; y++) {
-      for (int x = 0; x < cols; x++) {
-        data_[y * cols + x] = *elem;
-        elem++;
+    try {
+      It elem = start;
+      for (int y = 0; y < rows; y++) {
+        for (int x = 0; x < cols; x++) {
+          data_[y * cols + x] = *elem;
+          elem++;
+        }
       }
     }
+    catch (...) {
+      delete [] data_;
+      throw; 
+    }
+    
   }
 
   static MatrixData eye(int size) {
@@ -56,8 +69,15 @@ public:
   MatrixData(const MatrixData &other)
       : x_(other.x_), y_(other.y_), data_(new T[x_ * y_]) {
     size_t numElems = x_ * y_;
-    for (int i = 0; i < numElems; ++i) {
-      data_[i] = other.data_[i];
+
+    try {
+      for (int i = 0; i < numElems; ++i) {
+        data_[i] = other.data_[i];
+      }
+    }
+    catch (...) {
+      delete [] data_;
+      throw;
     }
   }
 
@@ -86,8 +106,8 @@ public:
     return *this;
   }
 
-  int ncols() const { return x_; }
-  int nrows() const { return y_; }
+  int ncols() const noexcept { return x_; }
+  int nrows() const noexcept { return y_; }
 
   ProxyRow operator[](int n) { return ProxyRow{data_ + n * x_}; }
 
